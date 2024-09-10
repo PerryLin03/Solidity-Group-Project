@@ -146,6 +146,33 @@
             alert('MetaMask is not installed. Please install MetaMask to use this feature.');
         }
 
+        const erc20Abi = [
+        // 定義 ERC-20 的標準 ABI
+        {
+            "constant": true,
+            "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
+            "name": "allowance",
+            "outputs": [{"name": "remaining", "type": "uint256"}],
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [{"name": "_owner", "type": "address"}],
+            "name": "balanceOf",
+            "outputs": [{"name": "balance", "type": "uint256"}],
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
+            "name": "approve",
+            "outputs": [{"name": "success", "type": "bool"}],
+            "type": "function"
+        }
+    ];
+
+
+
         const contractAddress = '0x7660fFdD34a455F02D329E341F7A84642d3731CE'; // 合約地址
         const abi = [
             {
@@ -943,54 +970,6 @@
         };
 
 
-
-        document.getElementById('deposit-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const selectedAsset = document.getElementById('asset-select').value;  // 獲取所選擇的資產
-            const assetAddress = assetAddresses[selectedAsset];                   // 將資產名稱轉換為合約地址
-            const amount = document.getElementById('amount').value;               // 獲取存款金額
-            const depositValue = web3.utils.toWei(amount, 'ether');               // 將金額轉換為最小單位
-            const accounts = await web3.eth.getAccounts();
-            const userAddress = accounts[0];
-
-            try {
-                // 如果選擇的資產不是 ETH，先授權合約轉移資產
-                if (selectedAsset !== 'ETH') {
-                    const tokenContract = new web3.eth.Contract(erc20Abi, assetAddress);
-                    // 調用 ERC-20 的 approve 函數
-                    await tokenContract.methods.approve(contractAddress, depositValue).send({ from: userAddress });
-                }
-
-                // 根據資產類型進行存款
-                if (selectedAsset === 'ETH') {
-                    // 對於 ETH 資產，使用 msg.value 傳遞金額
-                    await contract.methods.deposit(assetAddress, depositValue).send({ from: userAddress, value: depositValue });
-                } else {
-                    // 對於 ERC-20 資產，不使用 msg.value
-                    await contract.methods.deposit(assetAddress, depositValue).send({ from: userAddress });
-                }
-
-                alert(`You have successfully deposited ${amount} ${selectedAsset}.`);
-                updateDepositInfo(userAddress); // 更新存款信息
-            } catch (error) {
-                console.error("Error during deposit: ", error);
-                alert('Failed to make a deposit.');
-            }
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
         let contract;
         let web3;
 
@@ -1001,10 +980,11 @@
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
                     web3 = new Web3(window.ethereum);
                     const accounts = await web3.eth.getAccounts();
-                    const userAddress = accounts[0]; // 獲取當前用戶地址
+                    const userAddress = accounts[0]; // 確保獲取到了有效的用戶地址
                     contract = new web3.eth.Contract(abi, contractAddress);
                     console.log("Connected to contract!");
-                    updateDepositInfo(userAddress);
+
+                    updateDepositInfo(userAddress); // 傳入用戶地址
                 } catch (error) {
                     console.error("Error connecting to MetaMask: ", error);
                 }
@@ -1013,42 +993,93 @@
             }
         }
 
+
+        // 更新用戶的總存款和可借出資金
+        // 更新存款信息時根據資產類型調整精度顯示
         // 更新用戶的總存款和可借出資金
         async function updateDepositInfo(userAddress) {
             try {
-                const totalDeposit = await contract.methods.userDeposits(userAddress).call();
-                document.getElementById('total-deposit').innerText = web3.utils.fromWei(totalDeposit.amount, 'ether') + ' ETH';
-                document.getElementById('available-lend').innerText = web3.utils.fromWei(totalDeposit.amount, 'ether') + ' ETH';
+                const selectedAsset = document.getElementById('asset-select').value;
+                const assetAddress = assetAddresses[selectedAsset];
+
+                if (!assetAddress) {
+                    alert("Please select a valid asset.");
+                    return;
+                }
+
+                // 調用合約的 userDeposits 函數，傳入資產地址和用戶地址
+                const totalDeposit = await contract.methods.userDeposits(assetAddress, userAddress).call();
+
+                // 判斷資產類型來決定精度
+                let displayAmount;
+                if (selectedAsset === 'ETH') {
+                    displayAmount = web3.utils.fromWei(totalDeposit.amount, 'ether') + ' ETH';
+                } else {
+                    // 如果是 USDC/USDT/WBTC 等使用 6 位小數的資產
+                    displayAmount = web3.utils.fromWei(totalDeposit.amount, 'mwei') + ' ' + selectedAsset;
+                }
+
+                // 更新前端顯示
+                document.getElementById('total-deposit').innerText = displayAmount;
+                document.getElementById('available-lend').innerText = displayAmount;
             } catch (error) {
                 console.error("Error fetching deposit info: ", error);
             }
         }
 
+
+
+
+
+        // 處理存款表單提交
         // 處理存款表單提交
         document.getElementById('deposit-form').addEventListener('submit', async function(event) {
             event.preventDefault();
-            
-            // Get the selected asset
-            const selectedAsset = document.getElementById('asset-select').value;
-            
-            // Retrieve the contract address from the assetAddresses map
-            const assetAddress = assetAddresses[selectedAsset];
-            
-            const amount = document.getElementById('amount').value;
-            const depositValue = web3.utils.toWei(amount, 'ether');
+
+            const selectedAsset = document.getElementById('asset-select').value;  // 獲取所選擇的資產
+            const assetAddress = assetAddresses[selectedAsset];                   // 將資產名稱轉換為合約地址
+            const amount = document.getElementById('amount').value;               // 獲取存款金額
             const accounts = await web3.eth.getAccounts();
             const userAddress = accounts[0];
+            const depositValue = web3.utils.toWei(amount, 'mwei'); // 假設 USDC 是 6 位小數
+            const tokenContract = new web3.eth.Contract(erc20Abi, assetAddress);
 
             try {
-                // Call the deposit function with the contract address
-                await contract.methods.deposit(assetAddress, depositValue).send({ from: userAddress });
-                alert(`You have successfully deposited ${amount} ETH.`);
-                updateDepositInfo(userAddress); // Update deposit info
+                // 檢查 allowance
+                const allowance = await tokenContract.methods.allowance(userAddress, contractAddress).call();
+                if (parseFloat(depositValue) > parseFloat(allowance)) {
+                    // 如果 allowance 不足，則請求用戶授權
+                    await tokenContract.methods.approve(contractAddress, depositValue).send({
+                        from: userAddress
+                    });
+                    alert('Approval complete. You can now deposit.');
+                } else {
+                    // 已授權，計算 gas
+                    const gasEstimate = await contract.methods.deposit(assetAddress, depositValue).estimateGas({
+                        from: userAddress
+                    });
+                    // 存款操作完成後更新顯示
+                    await contract.methods.deposit(assetAddress, depositValue).send({
+                        from: userAddress,
+                        gas: gasEstimate,
+                        gasPrice: web3.utils.toWei('20', 'gwei')
+                    });
+                    alert(`You have successfully deposited ${amount} ${selectedAsset}.`);
+
+                    // 存款完成後立即調用以更新顯示
+                    updateDepositInfo(userAddress);
+                }
             } catch (error) {
                 console.error("Error during deposit: ", error);
-                alert('Failed to make a deposit.');
+                alert('Failed to approve or deposit.');
             }
-        });
+        }); // 這裡要加上這個閉合符號
+
+// 初始化合約
+initContract();
+
+
+
 
 
 
