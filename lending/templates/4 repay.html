@@ -130,49 +130,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script>
-        const contractAddress = '0x7660fFdD34a455F02D329E341F7A84642d3731CE'; // 合約地址
+        const contractAddress = '0xfB5AF694DE274d4378B342F07b2907cc6BdDf253'; // 合約地址
         const abi = [
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "borrowAsset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "collateralAsset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "borrowAmount",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "borrow",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "asset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "deposit",
-                "outputs": [],
-                "stateMutability": "payable",
-                "type": "function"
-            },
             {
                 "inputs": [],
                 "stateMutability": "nonpayable",
@@ -276,52 +235,6 @@
                 "type": "event"
             },
             {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "asset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "priceFeedAddress",
-                        "type": "address"
-                    }
-                ],
-                "name": "initializeAsset",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "borrower",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "borrowAsset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "collateralAsset",
-                        "type": "address"
-                    }
-                ],
-                "name": "liquidate",
-                "outputs": [],
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
                 "anonymous": false,
                 "inputs": [
                     {
@@ -378,31 +291,6 @@
                 "type": "event"
             },
             {
-                "inputs": [],
-                "name": "renounceOwnership",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "asset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "repay",
-                "outputs": [],
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
                 "anonymous": false,
                 "inputs": [
                     {
@@ -428,55 +316,6 @@
                 "type": "event"
             },
             {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "asset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "priceFeed",
-                        "type": "address"
-                    }
-                ],
-                "name": "setAssetPriceFeed",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "newOwner",
-                        "type": "address"
-                    }
-                ],
-                "name": "transferOwnership",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "asset",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "withdraw",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
                 "anonymous": false,
                 "inputs": [
                     {
@@ -500,55 +339,6 @@
                 ],
                 "name": "Withdraw",
                 "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "assetInfo",
-                "outputs": [
-                    {
-                        "internalType": "contract IERC20",
-                        "name": "token",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "contract AggregatorV3Interface",
-                        "name": "priceFeed",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "totalDeposits",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "totalBorrows",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "reserveFactor",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "lastUpdateTimestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "isActive",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
             },
             {
                 "inputs": [],
@@ -613,6 +403,187 @@
                     }
                 ],
                 "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "LIQUIDATION_BONUS",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "LIQUIDATION_THRESHOLD",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDC",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDC_USD_PRICE_FEED",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDT",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDT_USD_PRICE_FEED",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "WBTC",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "assetInfo",
+                "outputs": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "contract AggregatorV3Interface",
+                        "name": "priceFeed",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalDeposits",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalBorrows",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "reserveFactor",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastUpdateTimestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isActive",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "borrowAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "borrow",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "deposit",
+                "outputs": [],
+                "stateMutability": "payable",
                 "type": "function"
             },
             {
@@ -681,6 +652,30 @@
                 "inputs": [
                     {
                         "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getCollateralValue",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
                         "name": "borrowAsset",
                         "type": "address"
                     },
@@ -704,6 +699,29 @@
                     }
                 ],
                 "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "priceFeedAddress",
+                        "type": "address"
+                    }
+                ],
+                "name": "initializeAsset",
+                "outputs": [],
+                "stateMutability": "nonpayable",
                 "type": "function"
             },
             {
@@ -755,29 +773,26 @@
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "LIQUIDATION_BONUS",
-                "outputs": [
+                "inputs": [
                     {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
+                        "internalType": "address",
+                        "name": "borrower",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
                     }
                 ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "LIQUIDATION_THRESHOLD",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
+                "name": "liquidate",
+                "outputs": [],
+                "stateMutability": "payable",
                 "type": "function"
             },
             {
@@ -795,54 +810,58 @@
             },
             {
                 "inputs": [],
-                "name": "USDC",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
+                "name": "renounceOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "USDC_USD_PRICE_FEED",
-                "outputs": [
+                "inputs": [
                     {
                         "internalType": "address",
-                        "name": "",
+                        "name": "asset",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
                     }
                 ],
-                "stateMutability": "view",
+                "name": "repay",
+                "outputs": [],
+                "stateMutability": "payable",
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "USDT",
-                "outputs": [
+                "inputs": [
                     {
                         "internalType": "address",
-                        "name": "",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "priceFeed",
                         "type": "address"
                     }
                 ],
-                "stateMutability": "view",
+                "name": "setAssetPriceFeed",
+                "outputs": [],
+                "stateMutability": "nonpayable",
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "USDT_USD_PRICE_FEED",
-                "outputs": [
+                "inputs": [
                     {
                         "internalType": "address",
-                        "name": "",
+                        "name": "newOwner",
                         "type": "address"
                     }
                 ],
-                "stateMutability": "view",
+                "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
                 "type": "function"
             },
             {
@@ -904,16 +923,21 @@
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "WBTC",
-                "outputs": [
+                "inputs": [
                     {
                         "internalType": "address",
-                        "name": "",
+                        "name": "asset",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
                     }
                 ],
-                "stateMutability": "view",
+                "name": "withdraw",
+                "outputs": [],
+                "stateMutability": "nonpayable",
                 "type": "function"
             }
         ]
