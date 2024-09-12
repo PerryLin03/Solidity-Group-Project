@@ -38,16 +38,16 @@ abi = [
 		"type": "error"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "asset",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "priceFeed",
 				"type": "address"
@@ -57,28 +57,28 @@ abi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "borrowAsset",
 				"type": "address"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "collateralAsset",
 				"type": "address"
@@ -88,22 +88,22 @@ abi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "asset",
 				"type": "address"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
@@ -113,34 +113,34 @@ abi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "borrower",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "borrowAsset",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "collateralAsset",
 				"type": "address"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "liquidationAmount",
 				"type": "uint256"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "liquidatedCollateral",
 				"type": "uint256"
@@ -150,16 +150,16 @@ abi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "previousOwner",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "newOwner",
 				"type": "address"
@@ -169,22 +169,22 @@ abi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "asset",
 				"type": "address"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
@@ -194,22 +194,22 @@ abi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
 			},
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "address",
 				"name": "asset",
 				"type": "address"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
