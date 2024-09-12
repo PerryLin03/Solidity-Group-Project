@@ -3,284 +3,1013 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrow Page</title>
-    <style>
-        /* 基本样式 */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 40px auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        select, input[type="number"], button {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        /* 导航按钮样式 */
-        .nav-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-
-        .nav-button:hover {
-            background-color: #218838;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .form-container {
-                width: 90%;
-            }
-        }
-
-        /* 显示借款信息区域样式 */
-        .borrow-info {
-            margin: 20px 0;
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 18px;
-        }
-    </style>
+    <title>Borrow</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 </head>
 <body>
+    <h1>Borrow Page</h1>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('deposit') }}">Deposit</a>
+        <a href="{{ url_for('repay') }}">Repay</a>
+        <a href="{{ url_for('liquidation') }}">Liquidation</a>
+        <a href="{{ url_for('admin') }}">Admin</a>
+    </nav>
+    <form id="borrowForm">
+        <label for="borrow_asset">Borrow Asset:</label>
+        <select name="borrow_asset" id="borrow_asset">
+            <option value="ETH">ETH</option>
+            <option value="USDC">USDC</option>
+            <option value="USDT">USDT</option>
+            <option value="WBTC">WBTC</option>
+        </select>
+        <br>
+        <label for="collateral_asset">Collateral Asset:</label>
+        <select name="collateral_asset" id="collateral_asset">
+            <option value="ETH">ETH</option>
+            <option value="USDC">USDC</option>
+            <option value="USDT">USDT</option>
+            <option value="WBTC">WBTC</option>
+        </select>
+        <br>
+        <label for="borrow_amount">Borrow Amount:</label>
+        <input type="number" name="borrow_amount" id="borrow_amount" step="0.000001" required>
+        <br>
+        <button type="submit">Borrow</button>
+    </form>
+    <div id="message"></div>
 
-    <div class="container">
-        <h1>Borrow Page</h1>
-
-        <!-- 返回首页导航按钮 -->
-        <a href="1 index.html" class="nav-button">Home</a>
-
-        <!-- 借款信息显示区域 -->
-        <div class="borrow-info">
-            <p><strong>Collateral Available:</strong> <span id="collateral-available">Loading...</span></p>
-            <p><strong>Max Borrowable Amount:</strong> <span id="max-borrowable">Loading...</span></p>
-        </div>
-
-        <div class="form-container">
-            <form id="borrow-form">
-                <div class="form-group">
-                    <label for="collateral-select">Select Collateral Asset</label>
-                    <select id="collateral-select" name="collateral" required>
-                        <!-- 选项将动态添加 -->
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="asset-select">Select Borrow Asset</label>
-                    <select id="asset-select" name="asset" required>
-                        <option value="" disabled selected>Select an asset</option>
-                        <option value="ETH">ETH</option>
-                        <option value="USDC">USDC</option>
-                        <option value="USDT">USDT</option>
-                        <option value="WBTC">WBTC</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="borrow-amount">Borrow Amount</label>
-                    <input type="number" id="borrow-amount" name="amount" placeholder="Enter borrow amount" min="0" required>
-                    <span id="borrow-limit" style="color:red; display:none;">The max amount you can borrow is <span id="max-amount"></span></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="interest-rate">Interest Rate:</label>
-                    <span id="interest-rate">3% per year</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="repay-time">Repayment Deadline:</label>
-                    <span id="repay-time">30 days</span>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit">Borrow</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script>
+        let web3;
+        let contract;
+        let userAccount;
+
+        const contractAddress = "0x7660fFdD34a455F02D329E341F7A84642d3731CE";
+        const contractABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    }
+                ],
+                "name": "OwnableInvalidOwner",
+                "type": "error"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "OwnableUnauthorizedAccount",
+                "type": "error"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "priceFeed",
+                        "type": "address"
+                    }
+                ],
+                "name": "AssetPriceFeedUpdated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    }
+                ],
+                "name": "Borrow",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Deposit",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "borrower",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "liquidationAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "liquidatedCollateral",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Liquidation",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "previousOwner",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "OwnershipTransferred",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Repay",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Withdraw",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "BORROW_RATE",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "BTC_USD_PRICE_FEED",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "DEPOSIT_RATE",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "ETH",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "ETH_USD_PRICE_FEED",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "LIQUIDATION_BONUS",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "LIQUIDATION_THRESHOLD",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDC",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDC_USD_PRICE_FEED",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDT",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "USDT_USD_PRICE_FEED",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "WBTC",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "assetInfo",
+                "outputs": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "contract AggregatorV3Interface",
+                        "name": "priceFeed",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalDeposits",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalBorrows",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "reserveFactor",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastUpdateTimestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isActive",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "borrowAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "borrow",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "deposit",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getAccruedInterest",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    }
+                ],
+                "name": "getAssetPrice",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    }
+                ],
+                "name": "getAssetPriceFeed",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getCollateralValue",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "collateralAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getMaxBorrowAmount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "priceFeedAddress",
+                        "type": "address"
+                    }
+                ],
+                "name": "initializeAsset",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    }
+                ],
+                "name": "isAssetSupported",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "borrower",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    }
+                ],
+                "name": "isLiquidatable",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "borrower",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "borrowAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "collateralAsset",
+                        "type": "address"
+                    }
+                ],
+                "name": "liquidate",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "renounceOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "repay",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "priceFeed",
+                        "type": "address"
+                    }
+                ],
+                "name": "setAssetPriceFeed",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "userBorrows",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastUpdateTimestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "userDeposits",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastUpdateTimestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "asset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "withdraw",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        const ERC20_ABI = [
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "name",
+                "outputs": [{"name": "", "type": "string"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "approve",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [{"name": "", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_from", "type": "address"}, {"name": "_to", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "transferFrom",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"name": "", "type": "uint8"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"name": "balance", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{"name": "", "type": "string"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_to", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "transfer",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
+                "name": "allowance",
+                "outputs": [{"name": "remaining", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "inputs": [{"name": "_initialAmount", "type": "uint256"}, {"name": "_tokenName", "type": "string"}, {"name": "_decimalUnits", "type": "uint8"}, {"name": "_tokenSymbol", "type": "string"}],
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "name": "_from", "type": "address"}, {"indexed": true, "name": "_to", "type": "address"}, {"indexed": false, "name": "_value", "type": "uint256"}],
+                "name": "Transfer",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "name": "_owner", "type": "address"}, {"indexed": true, "name": "_spender", "type": "address"}, {"indexed": false, "name": "_value", "type": "uint256"}],
+                "name": "Approval",
+                "type": "event"
+            }
+        ];
+;
+
         const assetAddresses = {
-            "ETH": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-            "USDC": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
-            "USDT": "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0",
-            "WBTC": "0x29f2D40B0605204364af54EC677bD022dA425d03"
+            'ETH': '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+            'USDC': '0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8',
+            'USDT': '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+            'WBTC': '0x29f2D40B0605204364af54EC677bD022dA425d03'
         };
 
-        const contractAddress = '0xfB5AF694DE274d4378B342F07b2907cc6BdDf253';
-        let contract;
-        let web3;
-        let maxBorrowable;
-
-        // 初始化合约
-        async function initContract() {
-            if (window.ethereum) {
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(contractABI, contractAddress);
                 try {
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
                     const accounts = await web3.eth.getAccounts();
-                    const userAddress = accounts[0];
-                    contract = new web3.eth.Contract(abi, contractAddress);
-                    await updateBorrowInfo(userAddress);  // 確保這裡是 async function
+                    userAccount = accounts[0];
+                    console.log('Connected account:', userAccount);
                 } catch (error) {
-                    console.error("Error connecting to MetaMask: ", error);
+                    console.error("User denied account access");
                 }
+            } else {
+                console.log('Please install MetaMask!');
             }
-        }
+        });
 
-        
-        const deposit = await contract.methods.userDeposits(assetAddress, userAddress).call();
+        document.getElementById('borrowForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const borrowAsset = document.getElementById('borrow_asset').value;
+            const collateralAsset = document.getElementById('collateral_asset').value;
+            const borrowAmount = document.getElementById('borrow_amount').value;
 
+            if (!web3 || !contract || !userAccount) {
+                alert('Please connect your wallet first!');
+                return;
+            }
 
-        // 更新抵押资产选择器，只显示用户有存款的资产
-        async function updateCollateralOptions(userAddress) {
             try {
-                const assets = ['ETH', 'USDC', 'USDT', 'WBTC']; // 確認支持的資產清單
-                const availableAssets = [];
+                const borrowAssetAddress = assetAddresses[borrowAsset];
+                const collateralAssetAddress = assetAddresses[collateralAsset];
+                const decimals = borrowAsset === 'USDC' || borrowAsset === 'USDT' ? 6 : 18;
+                const weiAmount = web3.utils.toBN(borrowAmount).mul(web3.utils.toBN(10).pow(web3.utils.toBN(decimals)));
 
-                for (const asset of assets) {
-                    const depositAmount = await contract.methods.userDeposits(assetAddresses[asset], userAddress).call();
-                    if (depositAmount > 0) {
-                        availableAssets.push(asset);
+                // 检查抵押品余额和授权
+                if (collateralAsset !== 'ETH') {
+                    const collateralContract = new web3.eth.Contract(ERC20_ABI, collateralAssetAddress);
+                    const balance = await collateralContract.methods.balanceOf(userAccount).call();
+                    const allowance = await collateralContract.methods.allowance(userAccount, contractAddress).call();
+
+                    if (web3.utils.toBN(balance).lt(weiAmount)) {
+                        throw new Error('Insufficient collateral balance');
+                    }
+
+                    if (web3.utils.toBN(allowance).lt(weiAmount)) {
+                        await collateralContract.methods.approve(contractAddress, weiAmount).send({from: userAccount});
                     }
                 }
 
-                // 更新抵押資產選擇器
-                const collateralSelect = document.getElementById('collateral-select');
-                collateralSelect.innerHTML = ''; // 清空選擇器
-                availableAssets.forEach(asset => {
-                    const option = document.createElement('option');
-                    option.value = asset;
-                    option.text = asset;
-                    collateralSelect.appendChild(option);
+                // 估算 gas
+                const gasEstimate = await contract.methods.borrow(borrowAssetAddress, collateralAssetAddress, weiAmount).estimateGas({from: userAccount});
+                
+                // 执行借款
+                const result = await contract.methods.borrow(borrowAssetAddress, collateralAssetAddress, weiAmount).send({
+                    from: userAccount,
+                    gas: Math.floor(gasEstimate * 1.2) // 增加 20% 的 gas 限制
                 });
+
+                document.getElementById('message').textContent = `Successfully borrowed ${borrowAmount} ${borrowAsset} using ${collateralAsset} as collateral. Transaction hash: ${result.transactionHash}`;
             } catch (error) {
-                console.error('Error fetching collateral options:', error);
-            }
-        }
-
-
-
-        // 更新借款人可用的抵押和可借金额
-        async function updateBorrowInfo(userAddress) {
-            try {
-                const collateralSelected = document.getElementById('collateral-select').value;
-                const collateralAsset = assetAddresses[collateralSelected];
-
-                // 调用合约函数来获取抵押品的总价值
-                const collateralValue = await contract.methods.getCollateralValue(collateralAsset, userAddress).call();
-                
-                // 显示抵押品的价值
-                document.getElementById('collateral-available').innerText = web3.utils.fromWei(collateralValue, 'ether') + ' ETH';
-
-                // 根据抵押品的价值，计算最大可借金额
-                const maxBorrowAmount = await contract.methods.getMaxBorrowAmount('USDC', collateralAsset, collateralValue).call();
-                maxBorrowable = web3.utils.fromWei(maxBorrowAmount, 'mwei');
-                document.getElementById('max-borrowable').innerText = maxBorrowable + ' USDC';
-                
-            } catch (error) {
-                console.error("Error fetching borrow info: ", error);
-            }
-        }
-
-        // 实现最大可借金额的检查
-        document.getElementById('borrow-amount').addEventListener('input', function() {
-            const borrowAmount = document.getElementById('borrow-amount').value;
-            const borrowLimit = document.getElementById('borrow-limit');
-            if (parseFloat(borrowAmount) > parseFloat(maxBorrowable)) {
-                document.getElementById('max-amount').innerText = maxBorrowable;
-                borrowLimit.style.display = 'block';
-            } else {
-                borrowLimit.style.display = 'none';
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'Error: ' + error.message;
             }
         });
-
-        // 处理借款表单提交
-        document.getElementById('borrow-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const selectedAsset = document.getElementById('asset-select').value;  // 获取所选择的借款资产
-            const borrowAsset = assetAddresses[selectedAsset];  // 转换借款资产为合约地址
-
-            const collateralSelected = document.getElementById('collateral-select').value;  // 获取所选择的抵押品
-            const collateralAsset = assetAddresses[collateralSelected];  // 转换抵押品资产为合约地址
-
-            const borrowAmount = document.getElementById('borrow-amount').value;
-            const accounts = await web3.eth.getAccounts();
-            const userAddress = accounts[0];
-
-            try {
-                // 传递借款和抵押资产的合约地址
-                await contract.methods.borrow(borrowAsset, collateralAsset, web3.utils.toWei(borrowAmount, 'ether')).send({
-                    from: userAddress
-                });
-                alert(`You have successfully borrowed ${borrowAmount} ${selectedAsset}.`);
-                updateBorrowInfo(userAddress); // 借款成功后更新借款信息
-            } catch (error) {
-                console.error("Error during borrowing: ", error);
-                alert('Failed to borrow.');
-            }
-        });
-
-        // 初始化合约
-        initContract();
     </script>
-
 </body>
 </html>

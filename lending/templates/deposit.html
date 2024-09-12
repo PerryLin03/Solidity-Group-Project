@@ -3,178 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deposit Page</title>
-    <style>
-        /* 基本樣式 */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 40px auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        select, input[type="number"], button {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        /* 導航按鈕樣式 */
-        .nav-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-
-        .nav-button:hover {
-            background-color: #218838;
-        }
-
-        /* 響應式設計 */
-        @media (max-width: 768px) {
-            .form-container {
-                width: 90%;
-            }
-        }
-
-        /* 顯示總存款區域樣式 */
-        .deposit-info {
-            margin: 20px 0;
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 18px;
-        }
-    </style>
+    <title>Deposit</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 </head>
 <body>
+    <h1>Deposit Page</h1>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('borrow') }}">Borrow</a>
+        <a href="{{ url_for('repay') }}">Repay</a>
+        <a href="{{ url_for('liquidation') }}">Liquidation</a>
+        <a href="{{ url_for('admin') }}">Admin</a>
+    </nav>
+    <form id="depositForm">
+        <label for="asset">Asset:</label>
+        <select name="asset" id="asset">
+            <option value="ETH">ETH</option>
+            <option value="USDC">USDC</option>
+            <option value="USDT">USDT</option>
+            <option value="WBTC">WBTC</option>
+        </select>
+        <br>
+        <label for="amount">Amount:</label>
+        <input type="number" name="amount" id="amount" step="0.000001" required>
+        <br>
+        <button type="submit">Deposit</button>
+    </form>
+    <div id="message"></div>
 
-    <div class="container">
-        <h1>Deposit Page</h1>
-
-        <!-- 返回首頁導航按鈕 -->
-        <a href="1 index.html" class="nav-button">Home</a>
-
-        <!-- 存款信息顯示區域 -->
-        <div class="deposit-info">
-            <p><strong>Total Deposit:</strong> <span id="total-deposit">Loading...</span></p>
-            <p><strong>Available to Lend:</strong> <span id="available-lend">Loading...</span></p>
-        </div>
-
-        <div class="form-container">
-            <form id="deposit-form">
-                <div class="form-group">
-                    <label for="asset-select">Select Asset</label>
-                    <select id="asset-select" name="asset" required>
-                        <option value="" disabled selected>Select an asset</option>
-                        <option value="ETH">ETH</option>
-                        <option value="USDC">USDC</option>
-                        <option value="USDT">USDT</option>
-                        <option value="WBTC">WBTC</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="amount">Deposit Amount</label>
-                    <input type="number" id="amount" name="amount" placeholder="Enter amount to deposit" min="0" required>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit">Deposit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script>
-        // 檢查 MetaMask 是否已安裝
-        if (typeof window.ethereum !== 'undefined') {
-            console.log('MetaMask is installed!');
-            const web3 = new Web3(window.ethereum);
-        } else {
-            alert('MetaMask is not installed. Please install MetaMask to use this feature.');
-        }
+        // 添加 ERC20_ABI 定义
+        const ERC20_ABI = [
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "name",
+                "outputs": [{"name": "", "type": "string"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "approve",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [{"name": "", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_from", "type": "address"}, {"name": "_to", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "transferFrom",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"name": "", "type": "uint8"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"name": "balance", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{"name": "", "type": "string"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_to", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "transfer",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
+                "name": "allowance",
+                "outputs": [{"name": "remaining", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "inputs": [{"name": "_initialAmount", "type": "uint256"}, {"name": "_tokenName", "type": "string"}, {"name": "_decimalUnits", "type": "uint8"}, {"name": "_tokenSymbol", "type": "string"}],
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "name": "_from", "type": "address"}, {"indexed": true, "name": "_to", "type": "address"}, {"indexed": false, "name": "_value", "type": "uint256"}],
+                "name": "Transfer",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "name": "_owner", "type": "address"}, {"indexed": true, "name": "_spender", "type": "address"}, {"indexed": false, "name": "_value", "type": "uint256"}],
+                "name": "Approval",
+                "type": "event"
+            }
+        ];
 
-        const erc20Abi = [
-        // 定義 ERC-20 的標準 ABI
-        {
-            "constant": true,
-            "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
-            "name": "allowance",
-            "outputs": [{"name": "remaining", "type": "uint256"}],
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [{"name": "_owner", "type": "address"}],
-            "name": "balanceOf",
-            "outputs": [{"name": "balance", "type": "uint256"}],
-            "type": "function"
-        },
-        {
-            "constant": false,
-            "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
-            "name": "approve",
-            "outputs": [{"name": "success", "type": "bool"}],
-            "type": "function"
-        }
-    ];
+        let web3;
+        let contract;
+        let userAccount;
 
-
-
-        const contractAddress = '0xfB5AF694DE274d4378B342F07b2907cc6BdDf253'; // 合約地址
-        const abi = [
+        const contractAddress = "0x7660fFdD34a455F02D329E341F7A84642d3731CE";
+        const contractABI = [
             {
                 "inputs": [],
                 "stateMutability": "nonpayable",
@@ -983,134 +929,73 @@
                 "stateMutability": "nonpayable",
                 "type": "function"
             }
-        ]
+        ];
 
-        // 定義資產的地址映射
-        const assetAddresses = {
-            "ETH": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  // 假設的 ETH 地址
-            "USDC": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8", // USDC 合約地址
-            "USDT": "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0", // USDT 合約地址
-            "WBTC": "0x29f2D40B0605204364af54EC677bD022dA425d03"  // WBTC 合約地址
-        };
-
-
-        let contract;
-        let web3;
-
-        // 初始化合約
-        async function initContract() {
-            if (window.ethereum) {
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(contractABI, contractAddress);
                 try {
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
                     const accounts = await web3.eth.getAccounts();
-                    const userAddress = accounts[0]; // 確保獲取到了有效的用戶地址
-                    contract = new web3.eth.Contract(abi, contractAddress);
-                    console.log("Connected to contract!");
-
-                    updateDepositInfo(userAddress); // 傳入用戶地址
+                    userAccount = accounts[0];
+                    console.log('Connected account:', userAccount);
                 } catch (error) {
-                    console.error("Error connecting to MetaMask: ", error);
+                    console.error("User denied account access");
                 }
             } else {
-                alert('MetaMask is not installed. Please install MetaMask to use this feature.');
+                console.log('Please install MetaMask!');
             }
-        }
+        });
 
+        document.getElementById('depositForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const asset = document.getElementById('asset').value;
+            const amount = document.getElementById('amount').value;
 
-        // 更新用戶的總存款和可借出資金
-        // 更新存款信息時根據資產類型調整精度顯示
-        // 更新用戶的總存款和可借出資金
-        async function updateDepositInfo(userAddress) {
-            try {
-                const selectedAsset = document.getElementById('asset-select').value;
-                const assetAddress = assetAddresses[selectedAsset];
-
-                if (!assetAddress) {
-                    alert("Please select a valid asset.");
-                    return;
-                }
-
-                // 調用合約的 userDeposits 函數，傳入資產地址和用戶地址
-                const totalDeposit = await contract.methods.userDeposits(assetAddress, userAddress).call();
-
-                // 判斷資產類型來決定精度
-                let displayAmount;
-                if (selectedAsset === 'ETH') {
-                    displayAmount = web3.utils.fromWei(totalDeposit.amount, 'ether') + ' ETH';
-                } else {
-                    // 如果是 USDC/USDT/WBTC 等使用 6 位小數的資產
-                    displayAmount = web3.utils.fromWei(totalDeposit.amount, 'mwei') + ' ' + selectedAsset;
-                }
-
-                // 更新前端顯示
-                document.getElementById('total-deposit').innerText = displayAmount;
-                document.getElementById('available-lend').innerText = displayAmount;
-            } catch (error) {
-                console.error("Error fetching deposit info: ", error);
+            if (!web3 || !contract || !userAccount) {
+                alert('Please connect your wallet first!');
+                return;
             }
-        }
-
-
-
-
-
-        // 處理存款表單提交
-        // 處理存款表單提交
-        document.getElementById('deposit-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const selectedAsset = document.getElementById('asset-select').value;  // 獲取所選擇的資產
-            const assetAddress = assetAddresses[selectedAsset];                   // 將資產名稱轉換為合約地址
-            const amount = document.getElementById('amount').value;               // 獲取存款金額
-            const accounts = await web3.eth.getAccounts();
-            const userAddress = accounts[0];
-            const depositValue = web3.utils.toWei(amount, 'mwei'); // 假設 USDC 是 6 位小數
-            const tokenContract = new web3.eth.Contract(erc20Abi, assetAddress);
 
             try {
-                // 檢查 allowance
-                const allowance = await tokenContract.methods.allowance(userAddress, contractAddress).call();
-                if (parseFloat(depositValue) > parseFloat(allowance)) {
-                    // 如果 allowance 不足，則請求用戶授權
-                    await tokenContract.methods.approve(contractAddress, depositValue).send({
-                        from: userAddress
-                    });
-                    alert('Approval complete. You can now deposit.');
-                } else {
-                    // 已授權，計算 gas
-                    const gasEstimate = await contract.methods.deposit(assetAddress, depositValue).estimateGas({
-                        from: userAddress
-                    });
-                    // 存款操作完成後更新顯示
-                    await contract.methods.deposit(assetAddress, depositValue).send({
-                        from: userAddress,
-                        gas: gasEstimate,
-                        gasPrice: web3.utils.toWei('20', 'gwei')
-                    });
-                    alert(`You have successfully deposited ${amount} ${selectedAsset}.`);
-
-                    // 存款完成後立即調用以更新顯示
-                    updateDepositInfo(userAddress);
+                let assetAddress;
+                let decimals = 18; // 默认为 18 位小数
+                switch(asset) {
+                    case 'ETH':
+                        assetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+                        break;
+                    case 'USDC':
+                        assetAddress = '0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8';
+                        decimals = 6; // USDC 使用 6 位小数
+                        break;
+                    case 'USDT':
+                        assetAddress = '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0';
+                        decimals = 6; // USDT 也通常使用 6 位小数
+                        break;
+                    case 'WBTC':
+                        assetAddress = '0x29f2D40B0605204364af54EC677bD022dA425d03';
+                        decimals = 8; // WBTC 通常使用 8 位小数
+                        break;
                 }
+
+                const weiAmount = web3.utils.toBN(amount).mul(web3.utils.toBN(10).pow(web3.utils.toBN(decimals)));
+
+                if (asset === 'ETH') {
+                    await contract.methods.deposit(assetAddress, weiAmount).send({from: userAccount, value: weiAmount});
+                } else {
+                    // 首先需要批准合约使用代币
+                    const tokenContract = new web3.eth.Contract(ERC20_ABI, assetAddress);
+                    await tokenContract.methods.approve(contractAddress, weiAmount).send({from: userAccount});
+                    await contract.methods.deposit(assetAddress, weiAmount).send({from: userAccount});
+                }
+
+                document.getElementById('message').textContent = `Successfully deposited ${amount} ${asset}`;
             } catch (error) {
-                console.error("Error during deposit: ", error);
-                alert('Failed to approve or deposit.');
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'Error: ' + error.message;
             }
-        }); // 這裡要加上這個閉合符號
-
-// 初始化合約
-initContract();
-
-
-
-
-
-
-
-        // 初始化合約
-        initContract();
+        });
     </script>
-
 </body>
 </html>

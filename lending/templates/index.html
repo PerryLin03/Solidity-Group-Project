@@ -84,6 +84,7 @@
             color: #27ae60;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 </head>
 <body>
     <header>
@@ -97,11 +98,14 @@
             <p>Our decentralized lending protocol allows users to deposit assets, borrow against their collateral, repay loans, and liquidate positions at risk. Explore our services and get started!</p>
         </div>
         
+        <button id="connectWallet">Connect Wallet</button>
+        
         <nav class="nav-container">
-            <a href="2 deposit.html" class="nav-button">Deposit</a>
-            <a href="3 borrow.html" class="nav-button">Borrow</a>
-            <a href="4 repay.html" class="nav-button">Repay</a>
-            <a href="5 liquidation.html" class="nav-button">Liquidation</a>
+            <a href="{{ url_for('deposit') }}">Deposit</a>
+            <a href="{{ url_for('borrow') }}">Borrow</a>
+            <a href="{{ url_for('repay') }}">Repay</a>
+            <a href="{{ url_for('liquidation') }}">Liquidation</a>
+            <a href="{{ url_for('admin') }}">Admin</a>
         </nav>
         
         <section class="asset-prices">
@@ -112,9 +116,47 @@
         </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <script>
-        // Your existing JavaScript code here
+        let web3;
+        let userAccount;
+
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                try {
+                    // Request account access if needed
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    // Accounts now exposed
+                    const accounts = await web3.eth.getAccounts();
+                    userAccount = accounts[0];
+                    console.log('Connected account:', userAccount);
+                    document.getElementById('connectWallet').textContent = 'Wallet Connected';
+                } catch (error) {
+                    console.error("User denied account access");
+                }
+            } else {
+                console.log('Please install MetaMask!');
+            }
+        });
+
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Request account access
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await web3.eth.getAccounts();
+                    userAccount = accounts[0];
+                    console.log('Connected account:', userAccount);
+                    document.getElementById('connectWallet').textContent = 'Wallet Connected';
+                } catch (error) {
+                    console.error("User denied account access");
+                }
+            } else {
+                alert('Please install MetaMask!');
+            }
+        });
+
+        // Your existing JavaScript code for loading asset prices
         const assets = {
             ETH: { name: 'Ethereum', priceFeedAddress: '0x694AA1769357215DE4FAC081bf1f309aDC325306' },
             USDC: { name: 'USD Coin', priceFeedAddress: '0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E' },
@@ -141,8 +183,12 @@
         ];
 
         async function initWeb3() {
-            const web3 = new Web3('https://sepolia.infura.io/v3/33160349145e4d1b91ab109a94dd78d8');
-            loadPrices(web3);
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                loadPrices(web3);
+            } else {
+                console.log('Please install MetaMask!');
+            }
         }
 
         async function loadPrices(web3) {

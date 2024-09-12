@@ -3,135 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repay Page</title>
-    <style>
-        /* 基本樣式 */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 40px auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        select, input[type="number"], button {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        /* 導航按鈕樣式 */
-        .nav-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-
-        .nav-button:hover {
-            background-color: #218838;
-        }
-
-        /* 響應式設計 */
-        @media (max-width: 768px) {
-            .form-container {
-                width: 90%;
-            }
-        }
-
-        /* 顯示借款記錄區域樣式 */
-        .loan-info {
-            margin: 20px 0;
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 18px;
-        }
-    </style>
+    <title>Repay</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 </head>
 <body>
+    <h1>Repay Page</h1>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('deposit') }}">Deposit</a>
+        <a href="{{ url_for('borrow') }}">Borrow</a>
+        <a href="{{ url_for('liquidation') }}">Liquidation</a>
+        <a href="{{ url_for('admin') }}">Admin</a>
+    </nav>
+    <form id="repayForm">
+        <label for="asset">Asset:</label>
+        <select name="asset" id="asset">
+            <option value="ETH">ETH</option>
+            <option value="USDC">USDC</option>
+            <option value="USDT">USDT</option>
+            <option value="WBTC">WBTC</option>
+        </select>
+        <br>
+        <label for="amount">Repay Amount:</label>
+        <input type="number" name="amount" id="amount" step="0.000001" required>
+        <br>
+        <button type="submit">Repay</button>
+    </form>
+    <div id="message"></div>
 
-    <div class="container">
-        <h1>Repay Page</h1>
-
-        <!-- 返回首頁導航按鈕 -->
-        <a href="1 index.html" class="nav-button">Home</a>
-
-        <!-- 借款記錄顯示區域 -->
-        <div class="loan-info">
-            <p><strong>Loan Record:</strong> <span id="loan-record">Loading...</span></p>
-            <p><strong>Loan Amount:</strong> <span id="loan-amount">Loading...</span></p>
-            <p><strong>Repaid Amount:</strong> <span id="repaid-amount">Loading...</span></p>
-            <p><strong>Interest:</strong> <span id="interest-amount">Loading...</span></p>
-            <p><strong>Repayment Deadline:</strong> <span id="repay-deadline">Loading...</span></p>
-        </div>
-
-        <div class="form-container">
-            <form id="repay-form">
-                <div class="form-group">
-                    <label for="repay-amount">Repay Amount</label>
-                    <input type="number" id="repay-amount" name="amount" placeholder="Enter repay amount" min="0" required>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit">Repay</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script>
-        const contractAddress = '0xfB5AF694DE274d4378B342F07b2907cc6BdDf253'; // 合約地址
-        const abi = [
+        // 添加 ERC20_ABI 定义
+        const ERC20_ABI = [
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "name",
+                "outputs": [{"name": "", "type": "string"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "approve",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [{"name": "", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_from", "type": "address"}, {"name": "_to", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "transferFrom",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"name": "", "type": "uint8"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"name": "balance", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{"name": "", "type": "string"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_to", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "transfer",
+                "outputs": [{"name": "success", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
+                "name": "allowance",
+                "outputs": [{"name": "remaining", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "inputs": [{"name": "_initialAmount", "type": "uint256"}, {"name": "_tokenName", "type": "string"}, {"name": "_decimalUnits", "type": "uint8"}, {"name": "_tokenSymbol", "type": "string"}],
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "name": "_from", "type": "address"}, {"indexed": true, "name": "_to", "type": "address"}, {"indexed": false, "name": "_value", "type": "uint256"}],
+                "name": "Transfer",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "name": "_owner", "type": "address"}, {"indexed": true, "name": "_spender", "type": "address"}, {"indexed": false, "name": "_value", "type": "uint256"}],
+                "name": "Approval",
+                "type": "event"
+            }
+        ];
+
+        let web3;
+        let contract;
+        let userAccount;
+
+        const contractAddress = "0x7660fFdD34a455F02D329E341F7A84642d3731CE";
+        const contractABI = [
             {
                 "inputs": [],
                 "stateMutability": "nonpayable",
@@ -940,61 +929,75 @@
                 "stateMutability": "nonpayable",
                 "type": "function"
             }
-        ]
+        ];
 
-        let contract;
-        let web3;
+        const assetAddresses = {
+            'ETH': '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+            'USDC': '0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8',
+            'USDT': '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+            'WBTC': '0x29f2D40B0605204364af54EC677bD022dA425d03'
+        };
 
-        // 初始化合約
-        async function initContract() {
-            if (window.ethereum) {
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(contractABI, contractAddress);
                 try {
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
                     const accounts = await web3.eth.getAccounts();
-                    const userAddress = accounts[0]; // 取得使用者的地址
-                    contract = new web3.eth.Contract(abi, contractAddress);
-                    updateLoanInfo(userAddress);
+                    userAccount = accounts[0];
+                    console.log('Connected account:', userAccount);
                 } catch (error) {
-                    console.error("Error connecting to MetaMask: ", error);
+                    console.error("User denied account access");
                 }
-            }
-        }
-
-        // 更新用戶的借款記錄
-        async function updateLoanInfo(userAddress) {
-            try {
-                const loanRecord = await contract.methods.borrowRecords(userAddress, 0).call(); // 假設是從第一筆記錄開始
-                document.getElementById('loan-record').innerText = loanRecord.isActive ? "Active" : "Inactive";
-                document.getElementById('loan-amount').innerText = web3.utils.fromWei(loanRecord.amount, 'ether') + ' ETH';
-                document.getElementById('repaid-amount').innerText = web3.utils.fromWei(loanRecord.repaidAmount, 'ether') + ' ETH';
-                document.getElementById('interest-amount').innerText = loanRecord.interestRate + '%';
-                document.getElementById('repay-deadline').innerText = new Date(loanRecord.endsTime * 1000).toLocaleString();
-            } catch (error) {
-                console.error("Error fetching loan info: ", error);
-            }
-        }
-
-        // 處理還款表單提交
-        document.getElementById('repay-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const repayAmount = document.getElementById('repay-amount').value;
-            const accounts = await web3.eth.getAccounts();
-            const userAddress = accounts[0];
-
-            try {
-                await contract.methods.repay(0, web3.utils.toWei(repayAmount, 'ether')).send({ from: userAddress }); // 假設還款對象是第一筆借款記錄
-                alert(`You have successfully repaid ${repayAmount} ETH.`);
-                updateLoanInfo(userAddress); // 還款成功後更新借款資訊
-            } catch (error) {
-                console.error("Error during repayment: ", error);
-                alert('Failed to repay.');
+            } else {
+                console.log('Please install MetaMask!');
             }
         });
 
-        // 初始化合約
-        initContract();
-    </script>
+        document.getElementById('repayForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const asset = document.getElementById('asset').value;
+            const amount = document.getElementById('amount').value;
 
+            if (!web3 || !contract || !userAccount) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            try {
+                const assetAddress = assetAddresses[asset];
+                let decimals = 18; // 默认为 18 位小数
+                if (asset === 'USDC' || asset === 'USDT') {
+                    decimals = 6;
+                } else if (asset === 'WBTC') {
+                    decimals = 8;
+                }
+                const weiAmount = web3.utils.toBN(amount).mul(web3.utils.toBN(10).pow(web3.utils.toBN(decimals)));
+
+                // 获取用户当前借款金额
+                const userBorrow = await contract.methods.userBorrows(assetAddress, userAccount).call();
+                const borrowAmount = web3.utils.toBN(userBorrow.amount);
+
+                if (weiAmount.gt(borrowAmount)) {
+                    throw new Error('Repay amount exceeds borrowed amount');
+                }
+
+                if (asset === 'ETH') {
+                    await contract.methods.repay(assetAddress, weiAmount).send({from: userAccount, value: weiAmount});
+                } else {
+                    // 首先需要批准合约使用代币
+                    const tokenContract = new web3.eth.Contract(ERC20_ABI, assetAddress);
+                    await tokenContract.methods.approve(contractAddress, weiAmount).send({from: userAccount});
+                    await contract.methods.repay(assetAddress, weiAmount).send({from: userAccount});
+                }
+
+                document.getElementById('message').textContent = `Successfully repaid ${amount} ${asset}`;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
 </body>
 </html>
