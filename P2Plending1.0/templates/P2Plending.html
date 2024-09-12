@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Lending DApp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>P2P Lending Platform</h1>
+
+    <div id="wallet-connect">
+        <button id="connect-button">Connect Wallet</button>
+        <p id="wallet-address"></p>
+    </div>
+
+    <div class="section">
+        <h2>Depositor Section</h2>
+        <br><br>
+        <input type="number" id="min-deposit-amount" placeholder="Minimum Deposit Amount">
+        <button id="set-min-deposit-button">Set Minimum Deposit</button>
+        <br><br>
+        <button id="register-depositor-button">Register as Depositor</button>
+        <form id="deposit-form">
+            <input type="number" id="deposit-amount" placeholder="Deposit Amount">
+            <button type="submit">Deposit Money</button>
+        </form>
+        <input type="number" id="maxAmount" placeholder="Max Borrow Amount">
+        <input type="number" id="minAmount" placeholder="Min Borrow Amount">
+        <input type="number" id="interestRate" placeholder="Interest Rate">
+        <input type="number" id="collateralRate" placeholder="Collateral Rate">
+        <input type="number" id="maxTime" placeholder="Max Return Time">
+        <button onclick="addBorrowOption()">Add Borrow Option</button>
+        <div id="depositor-info"></div>
+    </div>
+
+    <div class="section">
+        <h2>Borrower Section</h2>
+        <button id="register-borrower-button">Register as Borrower</button>
+        <form id="collateral-form">
+            <input type="number" id="collateral-amount" placeholder="Collateral Amount">
+            <button type="submit">Deposit Collateral</button>
+        </form>
+        <div id="borrower-info"></div>
+    </div>
+
+    <div class="section">
+        <h2>Borrowing</h2>
+        <form id="borrow-form">
+            <input type="text" id="depositor-address" placeholder="Depositor Address">
+            <input type="number" id="borrow-index" placeholder="Option Index">
+            <input type="number" id="borrow-amount" placeholder="Borrow Amount">
+            <input type="number" id="borrow-time" placeholder="Max Time Before Return">
+            <button type="submit">Borrow Money</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>Repayment</h2>
+        <form id="repay-form">
+            <input type="number" id="repay-index" placeholder="Borrow Record Index">
+            <input type="number" id="repay-amount" placeholder="Repay Amount">
+            <button type="submit">Repay Loan</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='web3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
