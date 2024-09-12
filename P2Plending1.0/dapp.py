@@ -22,7 +22,7 @@ def create_database():
     
     # 创建 borrowoption 表
     c.execute('''
-         CREATE TABLE borrowoption (
+         CREATE TABLE if not exists borrowoption (
             Depositor_address VARCHAR(45) NOT NULL,
             maxAmount INT NOT NULL DEFAULT 0,
             minAmount INT NOT NULL DEFAULT 0,
@@ -35,7 +35,7 @@ def create_database():
 
     # 创建 borrower 表
     c.execute('''
-        CREATE TABLE borrower (
+        CREATE TABLE if not exists borrower (
           canBorrowCollateralAmount INT NOT NULL DEFAULT 0,
           Borrower_address VARCHAR(45) NOT NULL,
           collateralAmount INT NOT NULL DEFAULT 0,
@@ -46,7 +46,7 @@ def create_database():
 
     # 创建 borrowrecord 表
     c.execute('''
-          CREATE TABLE borrowrecord (              
+          CREATE TABLE if not exists borrowrecord (              
             Depositor_address varchar(45) NOT NULL,
             amount int NOT NULL DEFAULT '0',
             repaidAmount int NOT NULL DEFAULT '0',
