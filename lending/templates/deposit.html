@@ -5,31 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deposit</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        nav {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav a {
+            color: #333;
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: #ddd;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 3px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
 </head>
 <body>
-    <h1>Deposit Page</h1>
-    <nav>
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('borrow') }}">Borrow</a>
-        <a href="{{ url_for('repay') }}">Repay</a>
-        <a href="{{ url_for('liquidation') }}">Liquidation</a>
-        <a href="{{ url_for('admin') }}">Admin</a>
-    </nav>
-    <form id="depositForm">
-        <label for="asset">Asset:</label>
-        <select name="asset" id="asset">
-            <option value="ETH">ETH</option>
-            <option value="USDC">USDC</option>
-            <option value="USDT">USDT</option>
-            <option value="WBTC">WBTC</option>
-        </select>
-        <br>
-        <label for="amount">Amount:</label>
-        <input type="number" name="amount" id="amount" step="0.000001" required>
-        <br>
-        <button type="submit">Deposit</button>
-    </form>
-    <div id="message"></div>
+    <div class="container">
+        <h1>Deposit Page</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('borrow') }}">Borrow</a>
+            <a href="{{ url_for('repay') }}">Repay</a>
+            <a href="{{ url_for('liquidation') }}">Liquidation</a>
+            <a href="{{ url_for('admin') }}">Admin</a>
+        </nav>
+        <form id="depositForm">
+            <div>
+                <label for="asset">Asset:</label>
+                <select name="asset" id="asset">
+                    <option value="ETH">ETH</option>
+                    <option value="USDC">USDC</option>
+                    <option value="USDT">USDT</option>
+                    <option value="WBTC">WBTC</option>
+                </select>
+            </div>
+            <div>
+                <label for="amount">Amount:</label>
+                <input type="number" name="amount" id="amount" step="0.000001" required>
+            </div>
+            <button type="submit">Deposit</button>
+        </form>
+        <div id="message"></div>
+    </div>
 
     <script>
         // 添加 ERC20_ABI 定义
