@@ -124,6 +124,7 @@
                 <input type="number" id="maxTime" placeholder="Max Return Time">
                 <button onclick="addBorrowOption()">Add Borrow Option</button>
                 <div id="depositor-info"></div>
+                <div id="borrow-options"></div> <!-- 显示存款人所有borrowOptions -->
             </div>
         </div>
 
@@ -136,6 +137,7 @@
                     <button type="submit">Deposit Collateral</button>
                 </form>
                 <div id="borrower-info"></div>
+                <div id="borrow-records"></div> <!-- 显示借款人所有borrowRecords -->
             </div>
 
             <div class="section">
@@ -149,6 +151,11 @@
                 </form>
             </div>
         </div>
+    </div>
+
+    <div class="section">
+        <button onclick="getBorrowOptions(document.getElementById('wallet-address').innerText.split(': ')[1])">Show Borrow Options</button>
+        <button onclick="getBorrowRecords()">Show Borrow Records</button>
     </div>
 
     <script src="{{ url_for('static', filename='web3.min.js') }}"></script>

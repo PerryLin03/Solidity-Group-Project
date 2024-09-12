@@ -8,6 +8,7 @@ contract P2PLending is Token, Calculator{
     struct Depositor{
         uint depositeAmount;//总代币数目
         uint canLendAmount;//可借出的代币数目
+        uint borrowOptions_num;//条约数
     }
 
     struct Borrower{
@@ -15,6 +16,7 @@ contract P2PLending is Token, Calculator{
         uint canBorrowCollateralAmount;//可以用于借款的可用抵押品金额
         uint totalBorrowAmount;//所借的总金额
         uint borrowAmountRepaid;//借款人已偿还的贷款金额
+        uint borrowRecords_num;//借款人的借款条数
     }
 
     //配置借款条款
@@ -91,29 +93,29 @@ contract P2PLending is Token, Calculator{
     //存款人初始化
     function registerDepositor() public {
         require(depositors[msg.sender].depositeAmount == 0, "Depositor already registered");
-        depositors[msg.sender] = Depositor(0, 0);
+        depositors[msg.sender] = Depositor(0, 0, 0);
     }
 
-//存钱
-function depositMoney(uint _amount) public {
-    require(minDeposit > 0, "Set minDeposit first!");
-    require(_amount >= minDeposit, "Amount should be greater than minDeposit");
-    
-    // 先进行授权
-    token.approve(msg.sender, _amount);
-    
-    // 然后转移代币到合约
-    token.transferFrom(msg.sender, address(this), _amount);
+    //存钱
+    function depositMoney(uint _amount) public {
+        require(minDeposit > 0, "Set minDeposit first!");
+        require(_amount >= minDeposit, "Amount should be greater than minDeposit");
 
-    // 更新存款信息
-    depositors[msg.sender].depositeAmount += _amount;
-    depositors[msg.sender].canLendAmount += _amount;
+        // 先进行授权
+        token.approve(msg.sender, _amount);
 
-    emit Deposit(msg.sender, _amount);
-}
+        // 然后转移代币到合约
+        token.transferFrom(msg.sender, address(this), _amount);
 
-// 定义 Deposit 事件
-event Deposit(address indexed user, uint256 amount);
+        // 更新存款信息
+        depositors[msg.sender].depositeAmount += _amount;
+        depositors[msg.sender].canLendAmount += _amount;
+
+        emit Deposit(msg.sender, _amount);
+    }
+
+    // 定义 Deposit 事件
+    event Deposit(address indexed user, uint256 amount);
 
     //增加新借贷条款
     function addBorrowOption(
@@ -133,6 +135,21 @@ event Deposit(address indexed user, uint256 amount);
                 true
             )
         );
+        depositors[msg.sender].borrowOptions_num++;
+    }
+
+
+    // 查看指定存款人的借款选项
+    function viewBorrowOption(address depositor_add, uint index) public view returns (uint, uint, uint, uint, uint, bool) {
+        BorrowOption memory option = borrowOptions[depositor_add][index];
+        return (
+            option.maxAmount,
+            option.minAmount,
+            option.interestRate,
+            option.maxTimeBeforeReturn,
+            option.collateralRate,
+            option.isActive
+        );
     }
 
     //启动/关闭借贷条款
@@ -145,7 +162,7 @@ event Deposit(address indexed user, uint256 amount);
     //借款人初始化
     function registerBorrower() public {
         require(borrowers[msg.sender].collateralAmount == 0, "Borrower already registered");
-        borrowers[msg.sender] = Borrower(0, 0, 0, 0);
+        borrowers[msg.sender] = Borrower(0, 0, 0, 0, 0);
     }
 
     //质押
@@ -220,12 +237,29 @@ event Deposit(address indexed user, uint256 amount);
             true
         ));
 
+        borrowers[msg.sender].borrowRecords_num++;
+
         //将代币从合约转给借款人
         transferTokensToUser(msg.sender,_amount);
     }
 
 
 ///////**************还款相关函数****************\\\\\\\\\
+
+    // 查看指定借款人的借款记录
+    function viewBorrowRecord(address borrower_add, uint index) public view returns (uint, uint, uint, uint, uint, uint, address, bool) {
+        BorrowRecord memory record = borrowRecords[borrower_add][index];
+        return (
+            record.amount,
+            record.repaidAmount,
+            record.startedTime,
+            record.endsTime,
+            record.interestRate,
+            record.collateralRate,
+            record.depositor,
+            record.isActive
+        );
+    }
 
     function repay(uint _index, uint _amount) public onlyBorrower {
         require(borrowRecords[msg.sender][_index].isActive,

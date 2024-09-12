@@ -1,6 +1,6 @@
 let web3;
 let contract;
-const contractAddress = "0xae8169a70034695708a8baB52D6a47663363bCF8";
+const contractAddress = "0xa0005fcEed94DC24dAD3A1f661D2298b078a73b8";
 const contractABI = [
 	{
 		"inputs": [
@@ -275,6 +275,11 @@ const contractABI = [
 				"internalType": "uint256",
 				"name": "borrowAmountRepaid",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "borrowRecords_num",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -492,6 +497,11 @@ const contractABI = [
 				"internalType": "uint256",
 				"name": "canLendAmount",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "borrowOptions_num",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -583,6 +593,114 @@ const contractABI = [
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "depositor_add",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "viewBorrowOption",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "borrower_add",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "viewBorrowRecord",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -793,29 +911,56 @@ async function repay() {
 
 // Helper functions
 async function getBorrowOptions(depositorAddress) {
-    const borrowOptions = await contract.methods.borrowOptions(depositorAddress).call();
-    // Display borrow options in the UI
-    const optionsContainer = document.getElementById("borrow-options");
-    optionsContainer.innerHTML = borrowOptions.map((option, index) => `
-        <div>
-            Option ${index}: Max: ${option.maxAmount}, Min: ${option.minAmount}, 
-            Interest: ${option.interestRate}, Collateral Rate: ${option.collateralRate}
-        </div>
-    `).join('');
+    try {
+        const optionsContainer = document.getElementById("borrow-options");
+        optionsContainer.innerHTML = '';
+
+        // 获取存款人的借款选项数量
+        const borrowOptionsCount = await contract.methods.depositors(depositorAddress).call();
+        const optionsCount = borrowOptionsCount.borrowOptions_num;
+
+        for (let i = 0; i < optionsCount; i++) {
+            const option = await contract.methods.viewBorrowOption(depositorAddress, i).call();
+            optionsContainer.innerHTML += `
+                <div>
+                    Option ${i}: Max: ${option[0]}, Min: ${option[1]}, 
+                    Interest: ${option[2]}, Max Time: ${option[3]}, 
+                    Collateral Rate: ${option[4]}, Active: ${option[5]}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error("Error getting borrow options:", error);
+        alert("Failed to get borrow options. See console for details.");
+    }
 }
 
 async function getBorrowRecords() {
-    const accounts = await web3.eth.getAccounts();
-    const borrowRecords = await contract.methods.borrowRecords(accounts[0]).call();
-    // Display borrow records in the UI
-    const recordsContainer = document.getElementById("borrow-records");
-    recordsContainer.innerHTML = borrowRecords.map((record, index) => `
-        <div>
-            Record ${index}: Amount: ${record.amount}, Repaid: ${record.repaidAmount}, 
-            Started: ${new Date(record.startedTime * 1000).toLocaleString()}, 
-            Ends: ${new Date(record.endsTime * 1000).toLocaleString()}
-        </div>
-    `).join('');
+    try {
+        const accounts = await web3.eth.getAccounts();
+        const recordsContainer = document.getElementById("borrow-records");
+        recordsContainer.innerHTML = '';
+
+        // 获取借款人的借款记录数量
+        const borrowRecordsCount = await contract.methods.borrowers(accounts[0]).call();
+        const recordsCount = borrowRecordsCount.borrowRecords_num;
+
+        for (let i = 0; i < recordsCount; i++) {
+            const record = await contract.methods.viewBorrowRecord(accounts[0], i).call();
+            recordsContainer.innerHTML += `
+                <div>
+                    Record ${i}: Amount: ${record[0]}, Repaid: ${record[1]}, 
+                    Started: ${new Date(record[2] * 1000).toLocaleString()}, 
+                    Ends: ${new Date(record[3] * 1000).toLocaleString()}, 
+                    Interest: ${record[4]}, Collateral Rate: ${record[5]}, 
+                    Depositor: ${record[6]}, Active: ${record[7]}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error("Error getting borrow records:", error);
+        alert("Failed to get borrow records. See console for details.");
+    }
 }
 
 // Initialize the app
