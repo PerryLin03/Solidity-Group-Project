@@ -23,13 +23,13 @@ def create_database():
     # 创建 borrowoption 表
     c.execute('''
          CREATE TABLE borrowoption (
-            Depositor_address` VARCHAR(45) NOT NULL,
+            Depositor_address VARCHAR(45) NOT NULL,
             maxAmount INT NOT NULL DEFAULT 0,
             minAmount INT NOT NULL DEFAULT 0,
             interestRate int NOT NULL DEFAULT 0,
             maxTimeBeforeReturn INT NOT NULL DEFAULT 0,
             collateralRate int NOT NULL DEFAULT 0,
-            isActive SET("true", "false") NOT NULL DEFAULT 'false'
+            isActive INT NOT NULL DEFAULT 'false'
         );
     ''')
 
@@ -54,7 +54,7 @@ def create_database():
             endsTime int NOT NULL DEFAULT '0',
             interestRate int NOT NULL DEFAULT '0',
             collateralRate int NOT NULL DEFAULT '0',
-            isActive set('true','false') NOT NULL DEFAULT 'false'
+            isActive INT NOT NULL DEFAULT 'false'
          )
     ''')
 
