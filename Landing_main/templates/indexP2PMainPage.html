@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello, {{r}}! Welcome to P2P Lending Platform</title>
+    <title>P2P Lending Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         body {
@@ -54,13 +54,10 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="animate__animated animate__fadeInDown">P2P Lending Platform</h1>
-        <a href="/depositor" class="button animate__animated animate__fadeInLeft">Depositor Section</a>
-        <a href="/borrower" class="button animate__animated animate__fadeInRight">Borrower Section</a>
-        <br>
-        <a href="/" class="button animate__animated animate__fadeInUp">Back to Index</a>
+        <h2>Welcome to P2PLending!   May I know your name?</h2>
+        <form action="/P2PMainPage"  method="post">
+            <input type="text" name = "name" >
+            <input type="submit" value= "Enter">
     </div>
-    <script src="{{ url_for('static', filename='web3.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

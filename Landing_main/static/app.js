@@ -830,7 +830,8 @@ async function depositMoney() {
     }
 }
 
-async function addBorrowOption() {
+async function addBorrowOption(event) {
+	event.preventDefault();
     const accounts = await web3.eth.getAccounts();
     const maxAmount = document.getElementById("maxAmount").value;
     const minAmount = document.getElementById("minAmount").value;

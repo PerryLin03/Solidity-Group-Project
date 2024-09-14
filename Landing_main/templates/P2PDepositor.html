@@ -106,16 +106,16 @@
         <div class="section">
             <h2>Wallet Connection</h2>
             <button id="connect-button">Connect Wallet</button>
-            <p id="wallet-address"></p>
+            <p id="wallet-address" name="depositor_address" ></p>
         </div>
 
         <div class="section">
             <h2>Depositor Section</h2>
-            <input type="number" id="min-deposit-amount" placeholder="Minimum Deposit Amount">
+            <input type="number" id="min-deposit-amount" name="min-deposit-amount" placeholder="Minimum Deposit Amount">
             <button id="set-min-deposit-button">Set Minimum Deposit</button>
             <button id="register-depositor-button">Register as Depositor</button>
-            <form id="deposit-form">
-                <input type="number" id="deposit-amount" placeholder="Deposit Amount">
+            <form id="deposit-form" method="post">
+                <input type="number" id="deposit-amount" name="deposit_amount"placeholder="Deposit Amount">
                 <button type="submit">Deposit Money</button>
             </form>
             <div id="depositor-info"></div>
@@ -123,12 +123,14 @@
 
         <div class="section">
             <h2>Add Borrow Option</h2>
-            <input type="number" id="maxAmount" placeholder="Max Borrow Amount">
-            <input type="number" id="minAmount" placeholder="Min Borrow Amount">
-            <input type="number" id="interestRate" placeholder="Interest Rate">
-            <input type="number" id="collateralRate" placeholder="Collateral Rate">
-            <input type="number" id="maxTime" placeholder="Max Return Time">
-            <button onclick="addBorrowOption()">Add Borrow Option</button>
+            <form method="post" onsubmit="return addBorrowOption(event)">
+                <input type="number" id="maxAmount" name="maxAmount" placeholder="Max Borrow Amount">
+                <input type="number" id="minAmount" name="minAmount" placeholder="Min Borrow Amount">
+                <input type="number" id="interestRate" name="interestRate" placeholder="Interest Rate">
+                <input type="number" id="collateralRate" name="collateralRate" placeholder="Collateral Rate">
+                <input type="number" id="maxTime" name="maxTime" placeholder="Max Return Time">
+                <button type = "submit">Add Borrow Option</button>
+            </form>
         </div>
 
         <div class="section">

@@ -148,14 +148,14 @@
         <div class="section">
             <h2>Wallet Connection</h2>
             <button id="connect-button">Connect Wallet</button>
-            <p id="wallet-address"></p>
+            <p id="wallet-address" name="Borrower_address"></p>
         </div>
 
         <div class="section">
             <h2>Borrower Section</h2>
             <button id="register-borrower-button">Register as Borrower</button>
-            <form id="collateral-form">
-                <input type="number" id="collateral-amount" placeholder="Collateral Amount">
+            <form id="collateral-form" method="post">
+                <input type="number" id="collateral-amount" name="collateral_amount" placeholder="Collateral Amount">
                 <button type="submit">Deposit Collateral</button>
             </form>
             <div id="borrower-info"></div>
@@ -163,11 +163,11 @@
 
         <div class="section">
             <h2>Borrowing</h2>
-            <form id="borrow-form">
-                <input type="text" id="depositor-address" placeholder="Depositor Address">
-                <input type="number" id="borrow-index" placeholder="Option Index">
-                <input type="number" id="borrow-amount" placeholder="Borrow Amount">
-                <input type="number" id="borrow-time" placeholder="Max Time Before Return">
+            <form id="borrow-form" method="post">
+                <input type="text" id="depositor-address" name="depositor_address" placeholder="Depositor Address">
+                <input type="number" id="borrow-index" name="borrow_index" placeholder="Option Index">
+                <input type="number" id="borrow-amount" name="borrow_amount" placeholder="Borrow Amount">
+                <input type="number" id="borrow-time" name="borrow_time" placeholder="Max Time Before Return">
                 <button type="submit">Borrow Money</button>
             </form>
         </div>
@@ -181,8 +181,8 @@
         <div class="section">
             <h2>Repayment</h2>
             <form id="repay-form">
-                <input type="number" id="repay-index" placeholder="Borrow Record Index">
-                <input type="number" id="repay-amount" placeholder="Repay Amount">
+                <input type="number" id="repay-index" name="repay-index" placeholder="Borrow Record Index">
+                <input type="number" id="repay-amount" name="repay-amount" placeholder="Repay Amount">
                 <button type="submit">Repay Loan</button>
             </form>
         </div>

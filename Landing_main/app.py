@@ -856,13 +856,31 @@ def liquidation():
 def admin():
     return render_template('admin.html')
 
-@app.route('/P2PMainPage', methods=["GET", "POST"])
-def P2PMainPage():
-    return render_template('P2PMainPage.html')
+
+
+
+@app.route('/indexP2PMainPage', methods=["GET", "POST"])
+def indexP2PMainPage():
+
+    return render_template('indexP2PMainPage.html')
 
 @app.route('/redirect_to_p2plending')
 def redirect_to_p2plending():
-    return redirect(url_for('P2PMainPage'))
+    return redirect(url_for('indexP2PMainPage'))
+
+
+@app.route('/P2PMainPage',methods=["get","post"])
+def P2PMainPage():
+	result = request.form.get("name")
+	r = ''.join(result)
+	conn=sqlite3.connect('dapp.db')
+	c = conn.cursor()
+	c.execute("insert into user values (?)",(r,))
+	conn.commit()
+	c.close()
+	conn.close()
+	return render_template('P2PMainPage.html',r=r)
+
 
 @app.route('/depositor')
 def depositor():
@@ -879,11 +897,15 @@ def create_database():
     # 连接数据库，如果不存在则自动创建
     conn = sqlite3.connect('dapp.db')
     c = conn.cursor()
-    
+    c.execute('''
+        CREATE TABLE if not exists user (
+			username text
+        );
+    ''')
     # 创建 depositor 表
     c.execute('''
         CREATE TABLE if not exists depositor (
-            Depositor_address VARCHAR(45)  ,
+            Depositor_address text  ,
             depositeAmount INT   DEFAULT 0,
             canLendAmount INT   DEFAULT 0
         );
@@ -892,7 +914,7 @@ def create_database():
     # 创建 borrowoption 表
     c.execute('''
         CREATE TABLE if not exists borrowoption (
-            Depositor_address VARCHAR(45)  ,
+            Depositor_address text  ,
             maxAmount INT  DEFAULT 0,
             minAmount INT   DEFAULT 0,
             interestRate INT   DEFAULT 0,
@@ -906,7 +928,7 @@ def create_database():
     c.execute('''
         CREATE TABLE if not exists borrower (
             canBorrowCollateralAmount INT   DEFAULT 0,
-            Borrower_address VARCHAR(45) ,
+            Borrower_address text ,
             collateralAmount INT  DEFAULT 0,
             totalBorrowAmount INT   DEFAULT 0,
             borrowAmountRepaid INT   DEFAULT 0
@@ -916,7 +938,7 @@ def create_database():
     # 创建 borrowrecord 表
     c.execute('''
         CREATE TABLE if not exists borrowrecord (
-            Depositor_address VARCHAR(45) NOT NULL,
+            Depositor_address text NOT NULL,
             amount INT   DEFAULT 0,
             repaidAmount INT   DEFAULT 0,
             startedTime INT   DEFAULT 0,
