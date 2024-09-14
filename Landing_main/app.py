@@ -873,33 +873,33 @@ def create_database():
     # 创建 depositor 表
     c.execute('''
         CREATE TABLE if not exists depositor (
-            Depositor_address VARCHAR(45) NOT NULL,
-            depositeAmount INT NOT NULL DEFAULT 0,
-            canLendAmount INT NOT NULL DEFAULT 0
+            Depositor_address VARCHAR(45)  ,
+            depositeAmount INT   DEFAULT 0,
+            canLendAmount INT   DEFAULT 0
         );
     ''')
     
     # 创建 borrowoption 表
     c.execute('''
         CREATE TABLE if not exists borrowoption (
-            Depositor_address VARCHAR(45) NOT NULL,
-            maxAmount INT NOT NULL DEFAULT 0,
-            minAmount INT NOT NULL DEFAULT 0,
-            interestRate INT NOT NULL DEFAULT 0,
-            maxTimeBeforeReturn INT NOT NULL DEFAULT 0,
-            collateralRate INT NOT NULL DEFAULT 0,
-            isActive INT NOT NULL DEFAULT 0
+            Depositor_address VARCHAR(45)  ,
+            maxAmount INT  DEFAULT 0,
+            minAmount INT   DEFAULT 0,
+            interestRate INT   DEFAULT 0,
+            maxTimeBeforeReturn INT   DEFAULT 0,
+            collateralRate INT   DEFAULT 0,
+            isActive INT   DEFAULT 0
         );
     ''')
 
     # 创建 borrower 表
     c.execute('''
         CREATE TABLE if not exists borrower (
-            canBorrowCollateralAmount INT NOT NULL DEFAULT 0,
-            Borrower_address VARCHAR(45) NOT NULL,
-            collateralAmount INT NOT NULL DEFAULT 0,
-            totalBorrowAmount INT NOT NULL DEFAULT 0,
-            borrowAmountRepaid INT NOT NULL DEFAULT 0
+            canBorrowCollateralAmount INT   DEFAULT 0,
+            Borrower_address VARCHAR(45) ,
+            collateralAmount INT  DEFAULT 0,
+            totalBorrowAmount INT   DEFAULT 0,
+            borrowAmountRepaid INT   DEFAULT 0
         );
     ''')
 
@@ -907,13 +907,13 @@ def create_database():
     c.execute('''
         CREATE TABLE if not exists borrowrecord (
             Depositor_address VARCHAR(45) NOT NULL,
-            amount INT NOT NULL DEFAULT 0,
-            repaidAmount INT NOT NULL DEFAULT 0,
-            startedTime INT NOT NULL DEFAULT 0,
-            endsTime INT NOT NULL DEFAULT 0,
-            interestRate INT NOT NULL DEFAULT 0,
-            collateralRate INT NOT NULL DEFAULT 0,
-            isActive INT NOT NULL DEFAULT 0
+            amount INT   DEFAULT 0,
+            repaidAmount INT   DEFAULT 0,
+            startedTime INT   DEFAULT 0,
+            endsTime INT   DEFAULT 0,
+            interestRate INT   DEFAULT 0,
+            collateralRate INT   DEFAULT 0,
+            isActive INT   DEFAULT 0
         );
     ''')
 
