@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, redirect, render_template, request, jsonify, url_for
 from web3 import Web3
 import os
 import sqlite3
@@ -9,7 +9,7 @@ app = Flask(__name__)
 infura_url = os.environ.get('INFURA_URL', "https://sepolia.infura.io/v3/your-infura-project-id")
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
-# 合約地址與 ABI（保持不變）
+# 合約地址與 ABI
 contract_address = "0x7660fFdD34a455F02D329E341F7A84642d3731CE"
 abi = [
 	{
@@ -856,13 +856,23 @@ def liquidation():
 def admin():
     return render_template('admin.html')
 
-@app.route('/P2Plending', methods=["GET", "POST"])
-def P2Plending():
-    return render_template('P2Plending.html')
+@app.route('/P2PMainPage', methods=["GET", "POST"])
+def P2PMainPage():
+    return render_template('P2PMainPage.html')
 
 @app.route('/redirect_to_p2plending')
 def redirect_to_p2plending():
-    return redirect(url_for('P2Plending'))
+    return redirect(url_for('P2PMainPage'))
+
+@app.route('/depositor')
+def depositor():
+    return render_template('P2PDepositor.html')
+
+@app.route('/borrower')
+def borrower():
+    return render_template('P2PBorrower.html')
+
+
 
 # 连接数据库并创建表
 def create_database():
