@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from web3 import Web3
 import os
+import sqlite3
 
 app = Flask(__name__)
 
@@ -855,5 +856,72 @@ def liquidation():
 def admin():
     return render_template('admin.html')
 
+@app.route('/P2Plending', methods=["GET", "POST"])
+def P2Plending():
+    return render_template('P2Plending.html')
+
+@app.route('/redirect_to_p2plending')
+def redirect_to_p2plending():
+    return redirect(url_for('P2Plending'))
+
+# 连接数据库并创建表
+def create_database():
+    # 连接数据库，如果不存在则自动创建
+    conn = sqlite3.connect('dapp.db')
+    c = conn.cursor()
+    
+    # 创建 depositor 表
+    c.execute('''
+        CREATE TABLE if not exists depositor (
+            Depositor_address VARCHAR(45) NOT NULL,
+            depositeAmount INT NOT NULL DEFAULT 0,
+            canLendAmount INT NOT NULL DEFAULT 0
+        );
+    ''')
+    
+    # 创建 borrowoption 表
+    c.execute('''
+        CREATE TABLE if not exists borrowoption (
+            Depositor_address VARCHAR(45) NOT NULL,
+            maxAmount INT NOT NULL DEFAULT 0,
+            minAmount INT NOT NULL DEFAULT 0,
+            interestRate INT NOT NULL DEFAULT 0,
+            maxTimeBeforeReturn INT NOT NULL DEFAULT 0,
+            collateralRate INT NOT NULL DEFAULT 0,
+            isActive INT NOT NULL DEFAULT 0
+        );
+    ''')
+
+    # 创建 borrower 表
+    c.execute('''
+        CREATE TABLE if not exists borrower (
+            canBorrowCollateralAmount INT NOT NULL DEFAULT 0,
+            Borrower_address VARCHAR(45) NOT NULL,
+            collateralAmount INT NOT NULL DEFAULT 0,
+            totalBorrowAmount INT NOT NULL DEFAULT 0,
+            borrowAmountRepaid INT NOT NULL DEFAULT 0
+        );
+    ''')
+
+    # 创建 borrowrecord 表
+    c.execute('''
+        CREATE TABLE if not exists borrowrecord (
+            Depositor_address VARCHAR(45) NOT NULL,
+            amount INT NOT NULL DEFAULT 0,
+            repaidAmount INT NOT NULL DEFAULT 0,
+            startedTime INT NOT NULL DEFAULT 0,
+            endsTime INT NOT NULL DEFAULT 0,
+            interestRate INT NOT NULL DEFAULT 0,
+            collateralRate INT NOT NULL DEFAULT 0,
+            isActive INT NOT NULL DEFAULT 0
+        );
+    ''')
+
+    # 提交更改并关闭连接
+    conn.commit()
+    c.close()
+    conn.close()
+    
 if __name__ == '__main__':
+    create_database()
     app.run(debug=True)
