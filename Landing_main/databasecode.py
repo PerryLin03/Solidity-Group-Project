@@ -1,33 +1,28 @@
-#插入借款人信息
+	#插入借款人信息
     borrower_address = request.form.get("Borrower_address")
     collateral_amount = request.form.get("collateral_amount")
     maxAmount = request.form.get("maxAmount")
     minAmount = request.form.get("minAmount")
     interestRate = request.form.get("interestRate")
-
-    maxTime = request.form.get("maxTime")
-    act = 1
     conn = sqlite3.connect('dapp.db')
     c = conn.cursor()
-    c.execute("insert into user values (?,?,?,?,?,?,?)",(depositor_address,maxAmount,minAmount,interestRate,maxTime,collateralRate,act))
+    c.execute("insert into user values (?,?,?,?,?,?,?)",
+	(borrower_address,collateral_amount,maxAmount,interestRate,maxTime,minAmount,interestRate))
     conn.commit()
     c.close()
     conn.close()
-    return render_template('main.html')
 
 #插入存款人信息
     depositor_address = request.form.get("depositor_address")
     min_deposit_amount = request.form.get("min_deposit_amount")
     deposit_amount = request.form.get("deposit_amount")
-
-    act = 1
     conn = sqlite3.connect('dapp.db')
     c = conn.cursor()
-    c.execute("insert into user values (?,?,?)",(depositor_address,min_deposit_amount,deposit_amount))
+    c.execute("insert into user values (?,?,?)",
+	(depositor_address,min_deposit_amount,deposit_amount))
     conn.commit()
     c.close()
     conn.close()
-    return render_template('main.html')
 
 #插入借款条约信息
     depositor_address = request.form.get("depositor_address")
@@ -40,11 +35,11 @@
     act = 1
     conn = sqlite3.connect('dapp.db')
     c = conn.cursor()
-    c.execute("insert into user values (?,?,?,?,?,?,?)",(depositor_address,maxAmount,minAmount,interestRate,maxTime,collateralRate,act))
+    c.execute("insert into user values (?,?,?,?,?,?,?)",
+	(depositor_address,maxAmount,minAmount,interestRate,maxTime,collateralRate,act))
     conn.commit()
     c.close()
     conn.close()
-    return render_template('main.html')
 
 #插入借款记录信息
 r = request.form.get("q")
