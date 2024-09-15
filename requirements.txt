@@ -1,3 +1,5 @@
-Flask==2.0.1
-web3==5.27.0
+Flask==3.0.3
+web3==7.2.0
+parsimonious=0.10.0
+eth-abi=5.1.0
 gunicorn
