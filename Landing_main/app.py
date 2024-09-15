@@ -871,8 +871,7 @@ def redirect_to_p2plending():
 
 @app.route('/P2PMainPage',methods=["get","post"])
 def P2PMainPage():
-	result = request.form.get("name")
-	r = ''.join(result)
+	r = request.form.get("name")
 	conn=sqlite3.connect('dapp.db')
 	c = conn.cursor()
 	c.execute("insert into user values (?)",(r,))
