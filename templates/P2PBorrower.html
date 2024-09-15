@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Lending DApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 5px 0;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        button {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-weight: bold;
+            letter-spacing: 2px;
+            animation: fadeInDown 1s;
+        }
+        h2 {
+            color: white;
+            margin-top: 0;
+            font-size: 1.5em;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        ::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .main-page-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+            max-width: 1200px;
+            box-sizing: border-box;
+        }
+        .main-page-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .borrow-records {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .borrow-record {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .borrow-record:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .borrow-record h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            color: #f0f0f0;
+        }
+        .borrow-record p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        .borrow-record-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .borrow-record-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="animate__animated animate__fadeInDown">P2P Lending Platform</h1>
+
+    <div class="main-container">
+        <div class="section">
+            <h2>Wallet Connection</h2>
+            <button id="connect-button">Connect Wallet</button>
+            <p id="wallet-address" name="Borrower_address"></p>
+        </div>
+
+        <div class="section">
+            <h2>Borrower Section</h2>
+            <button id="register-borrower-button">Register as Borrower</button>
+            <form id="collateral-form" method="post">
+                <input type="number" id="collateral-amount" name="collateral_amount" placeholder="Collateral Amount">
+                <button type="submit">Deposit Collateral</button>
+            </form>
+            <div id="borrower-info"></div>
+        </div>
+
+        <div class="section">
+            <h2>Borrowing</h2>
+            <form id="borrow-form" method="post">
+                <input type="text" id="depositor-address" name="depositor_address" placeholder="Depositor Address">
+                <input type="number" id="borrow-index" name="borrow_index" placeholder="Option Index">
+                <input type="number" id="borrow-amount" name="borrow_amount" placeholder="Borrow Amount">
+                <input type="number" id="borrow-time" name="borrow_time" placeholder="Max Time Before Return">
+                <button type="submit">Borrow Money</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>All Depositors' Borrow Options</h2>
+            <button id="get-all-options-button">Get All Depositors' Borrow Options</button>
+            <div id="all-borrow-options"></div>
+        </div>
+
+        <div class="section">
+            <h2>Repayment</h2>
+            <form id="repay-form">
+                <input type="number" id="repay-index" name="repay-index" placeholder="Borrow Record Index">
+                <input type="number" id="repay-amount" name="repay-amount" placeholder="Repay Amount">
+                <button type="submit">Repay Loan</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Borrow Records</h2>
+            <div id="borrow-records" class="borrow-records">
+                <!-- Borrow records will be dynamically added here -->
+            </div>
+        </div>
+
+        <div id="borrow-options" style="display: none;"></div>
+    </div>
+
+    <div class="button-container">
+        <a href="/P2PMainPage" class="main-page-button animate__animated animate__fadeInUp">Back to Main Page</a>
+    </div>
+    <script src="{{ url_for('static', filename='web3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='borrow.js') }}"></script>
+
+</body>
+</html>
