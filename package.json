@@ -1,0 +1,28 @@
+{
+  "name": "solidity-group-project",
+  "version": "1.0.0",
+  "description": "原本將合約拆分成好幾份，但 external, internal, view 等等的一堆限制害我一直搞定不了 Bug，所以就全部寫成一份了。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PerryLin03/Solidity-Group-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PerryLin03/Solidity-Group-Project/issues"
+  },
+  "homepage": "https://github.com/PerryLin03/Solidity-Group-Project#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "ethers": "^6.13.5"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.18"
+  }
+}

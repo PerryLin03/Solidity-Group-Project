@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -55,12 +55,15 @@ contract EnhancedLendingProtocol is ReentrancyGuard, Ownable {
         initializeAsset(WBTC, WBTC, BTC_USD_PRICE_FEED);
     }
 
+    address[] public activeAssets;
     function initializeAsset(address asset, address tokenAddress, address priceFeedAddress) public onlyOwner {
         require(!assetInfo[asset].isActive, "Asset already initialized");
         assetInfo[asset].token = IERC20(tokenAddress);
         assetInfo[asset].priceFeed = AggregatorV3Interface(priceFeedAddress);
         assetInfo[asset].isActive = true;
         assetInfo[asset].lastUpdateTimestamp = block.timestamp;
+
+        activeAssets.push(asset); // Add assets to list
     }
 
     function deposit(address asset, uint256 amount) external payable nonReentrant {
@@ -246,6 +249,55 @@ contract EnhancedLendingProtocol is ReentrancyGuard, Ownable {
     function getAssetAmount(address asset, uint256 value) internal view returns (uint256) {
         uint256 price = getAssetPrice(asset);
         return value * 1e8 / price; // Assuming price is scaled to 8 decimals
+    }
+
+    function getMaxBorrowableAmounts(address user) external view returns (uint256[] memory, address[] memory) {
+        uint256 collateralValue = 0;
+        uint256 borrowValue = 0;
+        uint256 assetCount = activeAssets.length;
+
+        // Initialize result array
+        uint256[] memory maxBorrowableAmounts = new uint256[](assetCount);
+        address[] memory assets = new address[](assetCount);
+
+        // Calculate the total value of collateral and total loan amount
+        for (uint256 i = 0; i < assetCount; i++) {
+            address asset = activeAssets[i];
+
+            uint256 depositAmount = userDeposits[asset][user].amount;
+            uint256 borrowAmount = userBorrows[asset][user].amount;
+
+            // turn to value (USD)
+            if (depositAmount > 0) {
+                collateralValue += getAssetValue(asset, depositAmount);
+            }
+            if (borrowAmount > 0) {
+                borrowValue += getAssetValue(asset, borrowAmount);
+            }
+
+            // Storage asset address
+            assets[i] = asset;
+        }
+
+        // Calculate remaining loan amount
+        uint256 maxBorrowValue = (collateralValue * 100) / LIQUIDATION_THRESHOLD;
+        if (borrowValue >= maxBorrowValue) {
+            // If there is no available credit, the borrowable quantity of all assets is 0
+            for (uint256 i = 0; i < assetCount; i++) {
+                maxBorrowableAmounts[i] = 0;
+            }
+        } else {
+            uint256 remainingBorrowValue = maxBorrowValue - borrowValue;
+
+            // Calculate the maximum amount that can be borrowed for each asset
+            for (uint256 i = 0; i < assetCount; i++) {
+                address asset = assets[i];
+                uint256 maxAmount = getAssetAmount(asset, remainingBorrowValue);
+                maxBorrowableAmounts[i] = maxAmount;
+            }
+        }
+
+        return (maxBorrowableAmounts, assets);
     }
 
     // Events
